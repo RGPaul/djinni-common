@@ -13,7 +13,7 @@ declare djinni_file="djinni/appcom-common.djinni"
 declare yaml_out="."
 declare yaml_out_file="appcom-common.yml"
 
-rm -r $base_dir/generated-src/*
+rm -r $base_dir/generated-src/* || true
 
 java -jar bin/djinni.jar \
    --java-out $java_out \
