@@ -55,25 +55,25 @@ class DjinniCommonConan(ConanFile):
         tc.variables["ANDROID_STL"] = self.options.android_stl_type
         tc.variables["ANDROID_NATIVE_API_LEVEL"] = self.settings.os.api_level
         tc.variables["ANDROID_TOOLCHAIN"] = "clang"
-        tc.variables["DJINNI_WITH_JNI"] = "ON"
+        tc.variables["DJINNI_WITH_JNI"] = True
 
     def applyCmakeSettingsForiOS(self, tc):
-        tc.variables["CMAKE_SYSTEM_NAME"] = "iOS"
-        tc.variables["CMAKE_OSX_DEPLOYMENT_TARGET"] = "10.0"
-        tc.variables["DJINNI_WITH_OBJC"] = "ON"
-        tc.variables["CMAKE_OSX_SYSROOT"] = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
-        tc.variables["CMAKE_OSX_ARCHITECTURES"] = "armv7;armv7s;arm64;arm64e"
+        tc.cache_variables["CMAKE_SYSTEM_NAME"] = "iOS"
+        tc.cache_variables["CMAKE_OSX_DEPLOYMENT_TARGET"] = "10.0"
+        tc.cache_variables["DJINNI_WITH_OBJC"] = True
+        tc.cache_variables["CMAKE_OSX_SYSROOT"] = "/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk"
+        tc.cache_variables["CMAKE_OSX_ARCHITECTURES"] = "armv7;armv7s;arm64;arm64e"
 
         # define all architectures for ios fat library
         if "arm" in self.settings.arch:
-            tc.variables["CMAKE_OSX_ARCHITECTURES"] = "armv7;armv7s;arm64;arm64e"
+            tc.cache_variables["CMAKE_OSX_ARCHITECTURES"] = "armv7;armv7s;arm64;arm64e"
         else:
-            tc.variables["CMAKE_OSX_ARCHITECTURES"] = to_apple_arch(self.settings.arch)
+            tc.cache_variables["CMAKE_OSX_ARCHITECTURES"] = to_apple_arch(self.settings.arch)
         
 
     def applyCmakeSettingsFormacOS(self, tc):
-        tc.variables["CMAKE_OSX_ARCHITECTURES"] = to_apple_arch(self.settings.arch)
-        tc.variables["DJINNI_WITH_OBJC"] = "ON"
+        tc.cache_variables["CMAKE_OSX_ARCHITECTURES"] = to_apple_arch(self.settings.arch)
+        tc.cache_variables["DJINNI_WITH_OBJC"] = True
         
     def package_info(self):
         self.cpp_info.libs = collect_libs(self)
@@ -87,6 +87,7 @@ class DjinniCommonConan(ConanFile):
         self.requires("boost/1.82.0")
         self.requires("djinni/470@%s/%s" % (self.user, self.channel))
         self.requires("nlohmann_json/3.11.2")
+        self.tool_requires("djinni/470@%s/%s" % (self.user, self.channel))
 
     def configure(self):
         if self.settings.os == "Android":
