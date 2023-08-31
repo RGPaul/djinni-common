@@ -68,11 +68,11 @@ class DjinniCommonConan(ConanFile):
         if "arm" in self.settings.arch:
             tc.cache_variables["CMAKE_OSX_ARCHITECTURES"] = "armv7;armv7s;arm64;arm64e"
         else:
-            tc.cache_variables["CMAKE_OSX_ARCHITECTURES"] = to_apple_arch(self.settings.arch)
+            tc.cache_variables["CMAKE_OSX_ARCHITECTURES"] = to_apple_arch(self)
         
 
     def applyCmakeSettingsFormacOS(self, tc):
-        tc.cache_variables["CMAKE_OSX_ARCHITECTURES"] = to_apple_arch(self.settings.arch)
+        tc.cache_variables["CMAKE_OSX_ARCHITECTURES"] = to_apple_arch(self)
         tc.cache_variables["DJINNI_WITH_OBJC"] = True
         
     def package_info(self):
