@@ -82,7 +82,6 @@ class DjinniCommonConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = collect_libs(self)
         self.cpp_info.includedirs = ['include']
-        self.buildenv_info.define("DJINNI_JAR", os.path.join(self.package_folder, "bin", "djinni.sh"))
 
     def package_id(self):
         if "arm" in self.info.settings.get_safe("arch") and self.info.settings.get_safe("os") == "iOS":
@@ -92,10 +91,6 @@ class DjinniCommonConan(ConanFile):
         self.requires("boost/1.82.0")
         self.requires("djinni/470@%s/%s" % (self.user, self.channel))
         self.requires("nlohmann_json/3.11.2")
-
-    def imports(self):
-        #self.copy("djinni.jar", "bin", "bin")
-        copy(self, "djinni.jar", "bin", "bin")
 
     def configure(self):
         if self.settings.os == "Android":
