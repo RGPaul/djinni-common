@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 3.6)
 
+project(djinni-common)
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -8,13 +10,9 @@ if (NOT (DJINNI_WITH_OBJC OR DJINNI_WITH_JNI))
   message(FATAL_ERROR "At least one of DJINNI_WITH_OBJC or DJINNI_WITH_JNI must be enabled.")
 endif()
 
-# conan dependencies (try conan_paths first and then conanbuildinfo)
-if (EXISTS ${CMAKE_BINARY_DIR}/conan_paths.cmake)
-  include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-elseif (EXISTS ${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-  conan_basic_setup()
-endif()
+# Conan installs Library Config Files to the CMAKE_BINARY_DIR
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${CMAKE_BINARY_DIR})
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_BINARY_DIR} ${CMAKE_SOURCE_DIR})
 
 # ----------------------------------------------------------------------------------------------------------------------
 # General
@@ -44,9 +42,17 @@ file(GLOB objc_headers "${CMAKE_CURRENT_LIST_DIR}/src/objc/*.h")
 # ----------------------------------------------------------------------------------------------------------------------
 
 add_definitions(-DBOOST_FILESYSTEM_NO_DEPRECATED)
+find_package(Boost 1.82.0 REQUIRED)
 
 # ----------------------------------------------------------------------------------------------------------------------
-# appcom-djinni-common
+# NLohmann-JSON: https://github.com/nlohmann/json
+# ----------------------------------------------------------------------------------------------------------------------
+find_package(nlohmann_json REQUIRED)
+
+find_package(djinni REQUIRED)
+
+# ----------------------------------------------------------------------------------------------------------------------
+# djinni-common
 # ----------------------------------------------------------------------------------------------------------------------
 
 option(BUILD_STATIC_LIB "Build appcom-djinni-common library as a static library instead of dynamic (the default)." OFF)
@@ -65,8 +71,8 @@ if(DJINNI_WITH_OBJC)
   set_target_properties(appcom-djinni-common PROPERTIES COMPILE_FLAGS "-fobjc-arc")
   target_include_directories(appcom-djinni-common PRIVATE
                             # djinni support library
-                            "${CONAN_DJINNI_ROOT}/include/djinni/"
-                            "${CONAN_DJINNI_ROOT}/include/djinni/objc"
+                            "${djinni_INCLUDE_DIR}/djinni/"
+                            "${djinni_INCLUDE_DIR}/djinni/objc"
                             # djinni generated
                             "${CMAKE_CURRENT_LIST_DIR}/generated-src/objc"
                             "${CMAKE_CURRENT_LIST_DIR}/generated-src/objcpp"
@@ -83,8 +89,8 @@ if(DJINNI_WITH_JNI)
   source_group("jni" FILES ${jni_support_src} ${jni_generated_src})
   target_include_directories(appcom-djinni-common PRIVATE
                             # djinni support library
-                            "${CONAN_DJINNI_ROOT}/include/djinni/"
-                            "${CONAN_DJINNI_ROOT}/include/djinni/jni"
+                            "${djinni_INCLUDE_DIR}/djinni/"
+                            "${djinni_INCLUDE_DIR}/djinni/jni"
                             # djinni generated
                             "${CMAKE_CURRENT_LIST_DIR}/generated-src/jni"
                             "${CMAKE_CURRENT_LIST_DIR}/generated-src/cpp"
@@ -101,11 +107,7 @@ if(DJINNI_WITH_JNI)
   endif()
 endif()
 
-target_include_directories(appcom-djinni-common PRIVATE
-                          "${CONAN_BOOST_ROOT}/include"
-                          "${CONAN_NLOHMANN-JSON_ROOT}/include")
-
-target_link_libraries(appcom-djinni-common ${CONAN_LIBS})
+target_link_libraries(appcom-djinni-common boost::boost nlohmann_json::nlohmann_json djinni::djinni)
 
 install(TARGETS appcom-djinni-common
         LIBRARY DESTINATION "lib"

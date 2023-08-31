@@ -18,12 +18,16 @@ class DjinniCommonConan(ConanFile):
     description = "This library contains functions that are commonly used in djinni projects."
     url = "https://github.com/RGPaul/djinni-common"
     license = "MIT"
-    exports_sources = "cmake-modules/*", "src/*", "CMakeLists.txt", "bin/*", "djinni/*", "run-djinni.sh"
+    exports_sources = "cmake-modules/*", "src/*", "CMakeLists.txt", "djinni/*", "run-djinni.sh"
+    generators = "CMakeDeps"
 
     def generate(self):
+        djinni_dep = self.dependencies["djinni"]
+        copy(self, "djinni.jar", os.path.join(djinni_dep.package_folder, "bin"), os.path.join(self.build_folder, "bin"))
+        
         tc = CMakeToolchain(self)
 
-        self.run("./run-djinni.sh")
+        self.run(os.path.join(self.build_folder, "run-djinni.sh"))
 
         if self.settings.os == "Android":
             self.applyCmakeSettingsForAndroid(tc)
@@ -78,6 +82,7 @@ class DjinniCommonConan(ConanFile):
     def package_info(self):
         self.cpp_info.libs = collect_libs(self)
         self.cpp_info.includedirs = ['include']
+        self.buildenv_info.define("DJINNI_JAR", os.path.join(self.package_folder, "bin", "djinni.sh"))
 
     def package_id(self):
         if "arm" in self.info.settings.get_safe("arch") and self.info.settings.get_safe("os") == "iOS":
@@ -87,7 +92,10 @@ class DjinniCommonConan(ConanFile):
         self.requires("boost/1.82.0")
         self.requires("djinni/470@%s/%s" % (self.user, self.channel))
         self.requires("nlohmann_json/3.11.2")
-        self.tool_requires("djinni/470@%s/%s" % (self.user, self.channel))
+
+    def imports(self):
+        #self.copy("djinni.jar", "bin", "bin")
+        copy(self, "djinni.jar", "bin", "bin")
 
     def configure(self):
         if self.settings.os == "Android":
