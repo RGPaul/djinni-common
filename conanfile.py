@@ -12,7 +12,7 @@ class DjinniCommonConan(ConanFile):
     version = "1.0.4"
     author = "Ralph-Gordon Paul (development@rgpaul.com)"
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "android_ndk": "ANY", 
+    options = {"shared": [True, False], "android_ndk": [None, "ANY"], 
         "android_stl_type":["c++_static", "c++_shared"]}
     default_options = {"shared": False, "android_ndk": None, "android_stl_type": "c++_static"}
     description = "This library contains functions that are commonly used in djinni projects."
@@ -55,7 +55,6 @@ class DjinniCommonConan(ConanFile):
         android_toolchain = os.environ["ANDROID_NDK_PATH"] + "/build/cmake/android.toolchain.cmake"
         tc.variables["CMAKE_TOOLCHAIN_FILE"] = android_toolchain
         tc.variables["ANDROID_NDK"] = os.environ["ANDROID_NDK_PATH"]
-        tc.variables["ANDROID_ABI"] = tools.to_android_abi(self.settings.arch)
         tc.variables["ANDROID_STL"] = self.options.android_stl_type
         tc.variables["ANDROID_NATIVE_API_LEVEL"] = self.settings.os.api_level
         tc.variables["ANDROID_TOOLCHAIN"] = "clang"
