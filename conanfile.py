@@ -96,6 +96,13 @@ class DjinniCommonConan(ConanFile):
             self.options["boost"].shared = False
             self.options["boost"].android_ndk = self.options.android_ndk
             self.options["boost"].android_stl_type = self.options.android_stl_type
+            self.options["boost"].without_context = True
+            self.options["boost"].without_python = True
+            self.options["boost"].without_coroutine = True
+            self.options["boost"].without_fiber = True
+            self.options["boost"].without_locale = True
+            self.options["boost"].without_stacktrace = True
+            self.options["boost"].with_stacktrace_backtrace = False
 
             self.options["djinni"].shared = self.options.shared
             self.options["djinni"].android_ndk = self.options.android_ndk
