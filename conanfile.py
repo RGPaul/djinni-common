@@ -102,6 +102,7 @@ class DjinniCommonConan(ConanFile):
             self.options["boost"].without_fiber = True
             self.options["boost"].without_locale = True
             self.options["boost"].without_stacktrace = True
+            self.options["boost"].without_thread = True
             self.options["boost"].with_stacktrace_backtrace = False
 
             self.options["djinni"].shared = self.options.shared
