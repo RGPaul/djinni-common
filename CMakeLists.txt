@@ -108,6 +108,7 @@ if(DJINNI_WITH_JNI)
   else()
     # for android we have to link some android libraries
     target_link_libraries(appcom-djinni-common android log)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
   endif()
 endif()
 
