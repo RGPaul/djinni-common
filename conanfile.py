@@ -12,9 +12,8 @@ class DjinniCommonConan(ConanFile):
     version = "1.0.4"
     author = "Ralph-Gordon Paul (development@rgpaul.com)"
     settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False], "android_ndk": [None, "ANY"], 
-        "android_stl_type":["c++_static", "c++_shared"]}
-    default_options = {"shared": False, "android_ndk": None, "android_stl_type": "c++_static"}
+    options = {"shared": [True, False]}
+    default_options = {"shared": False}
     description = "This library contains functions that are commonly used in djinni projects."
     url = "https://github.com/RGPaul/djinni-common"
     license = "MIT"
@@ -55,7 +54,7 @@ class DjinniCommonConan(ConanFile):
         android_toolchain = os.environ["ANDROID_NDK_PATH"] + "/build/cmake/android.toolchain.cmake"
         tc.variables["CMAKE_TOOLCHAIN_FILE"] = android_toolchain
         tc.variables["ANDROID_NDK"] = os.environ["ANDROID_NDK_PATH"]
-        tc.variables["ANDROID_STL"] = self.options.android_stl_type
+        tc.variables["ANDROID_STL"] = "c++_static"
         tc.variables["ANDROID_NATIVE_API_LEVEL"] = self.settings.os.api_level
         tc.variables["ANDROID_TOOLCHAIN"] = "clang"
         tc.variables["DJINNI_WITH_JNI"] = True
@@ -94,8 +93,6 @@ class DjinniCommonConan(ConanFile):
     def configure(self):
         if self.settings.os == "Android":
             self.options["boost"].shared = False
-            self.options["boost"].android_ndk = self.options.android_ndk
-            self.options["boost"].android_stl_type = self.options.android_stl_type
             self.options["boost"].without_context = True
             self.options["boost"].without_coroutine = True
             self.options["boost"].without_fiber = True
@@ -105,11 +102,3 @@ class DjinniCommonConan(ConanFile):
             self.options["boost"].with_stacktrace_backtrace = False
 
             self.options["djinni"].shared = self.options.shared
-            self.options["djinni"].android_ndk = self.options.android_ndk
-            self.options["djinni"].android_stl_type = self.options.android_stl_type
-
-    def config_options(self):
-        # remove android specific option for all other platforms
-        if self.settings.os != "Android":
-            del self.options.android_ndk
-            del self.options.android_stl_type
